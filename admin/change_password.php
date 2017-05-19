@@ -66,13 +66,14 @@ $errors = array();
           echo display_errors($errors);
         } else {
           //change password
-          $sql = "UPDATE users SET password = '$newHashedPass' WHERE id = '$userID'";
+          $sql = "UPDATE users SET password = '$newHashedPass', passChangeByUser = passChangeByUser + 1 WHERE id = '$userID'";
           if( !($dbConnect->query($sql)) ){
             $errors[] .= "An error occured. Please try again.";
             header('Location: register.php');
           }else{
             $_SESSION['success_msg'] = "Your password has been updated. Please login to continue.";
-            header('Location: index.php');
+            header('Location: login.php');
+            unset($_SESSION['userID']);
           }
 
         }

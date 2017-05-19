@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/new/oldpcstuffshop/system_core/init.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/new/fashionboutique/system_core/init.php';
 
 $parentID = (int)$_POST['parentID'];  //this is from the ajax request, which is POSTED during AJAX
 $selected = (int)$_POST['selected'];  //the selected is also from ajax request, but this is for when edit is clicked

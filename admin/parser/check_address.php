@@ -1,6 +1,6 @@
 <?php
 
-  require_once $_SERVER['DOCUMENT_ROOT'].'/new/oldpcstuffshop/system_core/init.php';
+  require_once $_SERVER['DOCUMENT_ROOT'].'/new/fashionboutique/system_core/init.php';
 
   $firstName = sanitize($_POST['firstName']);
   $lastName = sanitize($_POST['lastName']);

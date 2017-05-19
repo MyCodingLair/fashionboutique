@@ -1,15 +1,16 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/new/oldpcstuffshop/system_core/init.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/new/fashionboutique/system_core/init.php';
 
-echo $product_id = sanitize($_POST['product_id']);
-echo $qty = sanitize($_POST['qty']);
-echo $available = sanitize($_POST['available']);
-
+$product_id = sanitize($_POST['product_id']);
+$qty = sanitize($_POST['quantity']);
+$size = sanitize($_POST['size']);
+$available = sanitize($_POST['available']);
 
 $item = array();
 $item[] = array(
   'id' => $product_id,
   'quantity' => $qty,
+  'size' => $size,
   'available' => $available,
 );
 
@@ -23,31 +24,31 @@ $product = mysqli_fetch_assoc($query);
 $_SESSION['success_msg'] = $product['title']. ' has been added to your cart.';
 
 //check if the cart cookies exist
-if($cart_id != ''){  //if the cart is not empty and there already exist item in the cart
+if($cart_id != ''){
   $cartSql = "SELECT * FROM cart WHERE id = '$cart_id'";
   $cartResult = $dbConnect->query($cartSql);
   $cart = mysqli_fetch_assoc($cartResult);
   $previousItem = json_decode($cart['item'], true);
-  $itemMatch = 0;  //initialize
-  $newItem = array();  //declare new array to hold the new items
+  $itemMatch = 0;
+  $newItem = array();
   foreach ($previousItem as $pItem) {
-    if($item[0]['id'] == $pItem['id'] && $item[0]['size'] == $pItem['size']){   //check if them item to be inserted to the cart is the same item/product
-      $pItem['quantity'] = $pItem['quantity'] + $item[0]['quantity'];  //if the same product, just add the quantity of the product
-      if($pItem['quantity'] > $available){  //double if the quantity added is more than the quantity available  ******************************======check back this logic later
-        $pItem['quantity'] = $available;   //if the quantity addded is more than available just assign the available value to the quantity
+    if($item[0]['id'] == $pItem['id'] && $item[0]['size'] == $pItem['size']){
+      $pItem['quantity'] = $pItem['quantity'] + $item[0]['quantity'];
+      if($pItem['quantity'] > $available){
+        $pItem['quantity'] = $available;
       }
-      $itemMatch = 1;  //set item match to 1, meaning the item is the same
+      $itemMatch = 1;
     }
-    $newItem[] = $pItem;  //set the new array $newItem to  $pItem
+    $newItem[] = $pItem;
   }
-  if($itemMatch != 1){   //if the new item/product added to the cart is not the same as the item/product already in the cart, 
-    $newItem = array_merge($item, $previousItem);  //merge the new item/product with the previous one to the $newItem which will be insert into the DB in the query below
+  if($itemMatch != 1){
+    $newItem = array_merge($item, $previousItem);
   }
   $items_json = json_encode($newItem);
   $cart_expire = date('Y-m-d H:i:s', strtotime('+30 days'));
   $dbConnect->query("UPDATE cart SET item = '{$items_json}', expireDate = '{$cart_expire}' WHERE id = '{$cart_id}'");
-  setcookie(CART_COOKIE, '', 1, '/', $domain, false);  //unset the cookie
-  setcookie(CART_COOKIE, $cart_id, CART_COOKIE_EXPIRE, '/', $domain, false);   //set the cookie again
+  setcookie(CART_COOKIE, '', 1, '/', $domain, false);
+  setcookie(CART_COOKIE, $cart_id, CART_COOKIE_EXPIRE, '/', $domain, false);
 
 
 }else {

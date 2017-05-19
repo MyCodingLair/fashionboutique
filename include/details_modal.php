@@ -7,17 +7,17 @@
   $id = (int)$id; //this is to parse the id into an interger, make sure the value that has been pass in an interger
   $sql = "SELECT * FROM product WHERE id = '$id' ";
   $query = $dbConnect->query($sql);
-  $productDetails =mysqli_fetch_assoc($query);
+  $productDetails = mysqli_fetch_assoc($query);
 
   $brand = $productDetails['brand'];
-
-  $available = $productDetails['quantityAvailable'];
 
   $sqlBrand = "SELECT * FROM brand WHERE id = '$brand' ";
   $brandQuery = $dbConnect->query($sqlBrand);
   $brandResult = mysqli_fetch_assoc($brandQuery);
 
-  $qty = 1;
+  $sizeString = $productDetails['sizes'];
+  $sizeArray = explode(',', $sizeString);
+
 
 ?>
 <?php
@@ -35,6 +35,7 @@
       <div class="modal-body">
         <div class="container-fluid">
           <div class="row">
+            <span id="modal_errors" class="bg-danger"></span>
             <div class="col-sm-6">
               <div class="center-block">
                 <img src="<?= $productDetails['productImage'];?>" alt="<?= $productDetails['title']; ?>" class="details img-responsive"/>
@@ -47,43 +48,47 @@
               <p>Price: $<?= $productDetails['price'];?> </p>
               <p>Brand: <?= $brandResult['brand']; ?> </p>
               <form action="add_cart.php" method="Post" id="add_product_form">
+
+                <input type="hidden" name="product_id" value="<?=$id;?>">
+
+
                 <div class="form-group">
                   <div class="col-xs-5">
                     <label for="quantity">Quantity: </label>
-
-                    <input type="hidden" name="product_id" value="<?=$id;?>">
-                    <!--<input type="hidden" name="available" id="available" value="<?=$available;?>">-->
-                    <input type="hidden" name="available" id="available" value="<?=$productDetails['quantityAvailable'];?>">
-
-
+                    <input type="number" class="form-control" id="quantity" name="quantity" min="1">
                     <!--Quantity Selector Start-->
-                    <div class="input-group">
+                    <!-- <div class="input-group">
                       <span class="input-group-btn">
-                        <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="qty">
+                        <button type="button" class="btn btn-default btn-number" disabled="disabled" data-type="minus" data-field="quant[1]">
                             <span class="glyphicon glyphicon-minus"></span>
                         </button>
                       </span>
-                      <input readonly type="text" name="qty" class="form-control input-number" value="<?=$qty;?>" min="1" max="<?= $productDetails['quantityAvailable']; ?>">
+                      <input type="text" name="quant[1]" class="form-control input-number" value="1" min="1" max="<?= $productDetails['sizes']; ?>">
                       <span class="input-group-btn">
-                        <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="qty">
+                        <button type="button" class="btn btn-default btn-number" data-type="plus" data-field="quant[1]">
                             <span class="glyphicon glyphicon-plus"></span>
                         </button>
                       </span>
-                    </div>
+                      <!-- <script src="http://localhost/new/fashionboutique/js/quantityButton.js"></script> -->
+                    <!-- </div> -->
                     <!--Quantity Selector End -->
-                    
-
                   </div>
-                  <?php
-                    if($available == 1){
-                      $unit = 'unit.';
-                    }else{
-                      $unit = 'units.';
-                    }
-                  ?>
-                  <p>Available:  <?=(($available <= 4)?'<span class="lowQty">'.$available.'</span>'.' '.$unit.'<span class="limited">(limited stock)</span>' : $available.' '.$unit);?> </p>
+                  <p>Available: </p>
+
                 </div>
                 <br><br>
+                <div class="form-group col-3">
+                  <label for="size">Size: </label>
+                  <select name="size" id="size" class="form-control">
+                    <?php foreach ($sizeArray as $string) {
+                      $stringArray = explode(':', $string);
+                      $size = $stringArray[0];
+                      $available = $stringArray[1];
+                      echo '<option value="'.$size.'" data-available="'.$available.'">'.$size.'('.$available.' Available)</option>';
+                    } ?>
+                  </select>
+                </div>
+                <input type="hidden" name="available" id="available" value="<?=$available;?>">
               </form>
             </div>
           </div>
@@ -91,16 +96,20 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-sm btn-default" onclick="closeModal()">Close</button>
-        <button class="btn btn-sm btn-warning" onclick="add_to_cart()"><span class="glyphicon glyphicon-shopping-cart"></span>Add To Cart</button>
-        <button class="btn btn-sm btn-warning" type="submit"><span class="glyphicon glyphicon-shopping-cart"></span>Submit To Cart</button>
+        <button class="btn btn-sm btn-warning" onclick="add_to_cart();return false;"><span class="glyphicon glyphicon-shopping-cart"></span> Add To Cart</button>
       </div>
     </div>
   </div>
 </div>
 
+<?php
+
+
+?>
+
 <!--Script for the quantity selector button Start here -->
 
-<script>
+<!-- <script>
 //plugin bootstrap minus and plus
 //http://jsfiddle.net/laelitenetwork/puJ6G/
 $('.btn-number').click(function(e){
@@ -175,11 +184,21 @@ $(".input-number").keydown(function (e) {
         }
     });
 
-</script>
+</script> -->
 
 <!--Script for the quantity selector button End here -->
 
+
 <script>  //script to hold the function to close the modal when the close button is clicked
+
+  // jQuery('#size').change(function(){  //listen to the <select id="sizes"> element and get the data-available attribute value from that element and assign it to 'var available'
+  //   var available = jQuery('#size option:selected').data("available");
+  //   jQuery('#available').val(available);  //use the assigned var available value and set it to be the value of the element <input id="available">
+  // });
+
+
+
+
   function closeModal(){
     //jquery
     $('#details-modal').modal('hide'); // the modal('close') function is from bootsrap

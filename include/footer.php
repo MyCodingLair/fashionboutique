@@ -19,7 +19,7 @@
     var dataToPost = {"id":id};  //this is a JSON string, the id is pass down from the productDetailsFuncModal(id) function parameter
     jQuery.ajax({
       //url: <?=BASE_URL; ?>+'include/details_modal.php',    //also can be writen as:-> url: "http://localhost/new/oldpcstuffshop/include/details_modal.php",
-      url: "/new/oldpcstuffshop/include/details_modal.php",
+      url: "/new/fashionboutique/include/details_modal.php",
       method:"post",
       data: dataToPost, //the data to post to the page
       success: function(data){   //if success perform the following
@@ -37,26 +37,25 @@
   }
 
 
-//=====================================add_to_cart() function ===============================
   function add_to_cart(){
     jQuery('#modal_errors').html('');
-    
-    var qty = jQuery('#qty').val();
+    var size = jQuery('#size').val();
+    var qty = jQuery('#quantity').val();
     var available = jQuery('#available').val();
     var error = '';
     var data = jQuery('#add_product_form').serialize();
-    if(qty == '' || qty == 0){
+    if(size = '' || qty == '' || qty == 0){
       error += '<p class="text-danger text-center">You must chooose quantity</p>' ;
       jQuery('#modal_errors').html(error);
       return;
-    } 
+    }
     else{
       jQuery.ajax({
-        url : '/new/oldpcstuffshop/admin/parser/add_cart.php',
+        url : '/new/fashionboutique/admin/parser/add_cart.php',
         method : 'post',
         data : data,
         success : function(){
-          location.reload();    
+          location.reload();
         },
         error : function(){alert("Something went wrong!");}
       });
@@ -65,11 +64,11 @@
   }
 
 
-  //this function is use in cart.php for the + and = button to update the quantity in the cart
-  function updateCart(mode, edit_id, edit_qty){
-    var data = {'mode':mode, 'edit_id':edit_id, 'edit_qty':edit_qty};
+
+  function updateCart(mode, edit_id, edit_size){
+    var data = {'mode':mode, 'edit_id':edit_id, 'edit_size':edit_size};
     jQuery.ajax({
-      url     : '/new/oldpcstuffshop/admin/parser/update_cart.php',
+      url     : '/new/fashionboutique/admin/parser/update_cart.php',
       method  : 'post',
       data    : data,
       success : function(){ location.reload(); },
@@ -77,7 +76,6 @@
     });
 
   }
-
 
 
 

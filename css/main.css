@@ -1,7 +1,7 @@
-body{
+  body{
   padding-top: 50px;
 }
-#headerWrapper{
+#header-wrapper{
   position: relative;
   padding: 0;
   margin: 0;
@@ -34,6 +34,41 @@ body{
   margin-top: -90px;
 }
 
+#trimmed-header-wrapper{
+  position: relative;
+  padding: 0;
+  margin: 0;
+  overflow: hidden;
+  height: 210px;
+  background-image: url(../images/header/background-image.jpg);
+  background-repeat: no-repeat;
+  background-size: 100% 700px;
+  background-position: top center;
+  background-attachment: fixed;
+
+  /*bluring the image--
+  -webkit-filter: blur(5px);
+  -moz-filter: blur(5px);
+  -o-filter: blur(5px);
+  -ms-filter: blur(5px);
+  filter: blur(5px);
+  --bluring the image*/
+}
+
+#trimmed-logotext{
+  position: absolute;
+  width: 100%;
+  height: 180px;
+  background-image: url(../images/header/grey-logo-text.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 70% 180px;
+  top: 50%;
+  margin-top: -90px;
+}
+
+
+
 .img-thumb{
   width: auto;
   height: 120px;
@@ -57,7 +92,7 @@ img.details{
   margin-top: -35px;
 }
 
-.savedImage {
+.saved_image img{
   width: 200px;
   height: auto;
 }
@@ -72,20 +107,9 @@ img.details{
   background-color: #fff;
 }
 
-.limited{
-  color: #A9A9A9;
-}
-
-.lowQty{
-  color: #e5542f;
-}
-
-
 .totals-table-header th{
   text-align: right;
 }
-
-
 
 #step1{
   display: block;
@@ -97,12 +121,11 @@ img.details{
 
 }
 
-#nextBtn{
-  display: inline-block;
-}
-
 #backBtn{
   display: none;
+}
+#nextBtn{
+  display: inline-block;
 }
 #checkOutBtn{
   display: none;

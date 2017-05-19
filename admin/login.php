@@ -1,5 +1,5 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/new/oldpcstuffshop/system_core/init.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/new/fashionboutique/system_core/init.php';
 include 'include/head.php';
 include 'include/nav.php';
 
@@ -48,6 +48,14 @@ $errors = array();
         if($numrow == 0){
           $errors[] .= "User doesn't exist!";
         }
+
+        // //check if password has not changed since first login or on first login
+        // if( $user['passChangeByUser'] == 0 ){
+        //   $_SESSION['passHavNotChange'] = "Reminder! Please change your password.";
+        // }
+        // if($user['passChangeByAdmin'] > 0){
+        //   $_SESSION['passHavNotChange'] = "Note: Your password has been changed by request. Please change your given password by admin to a new one .";
+        // }
 
         if(!password_verify($password, $user['password'])){   //password_verify() is a php function to verify the password mathces the hash, 1st param is the string that store the password, 2nd param is the hashed password from DB to verify it with
           $errors[] .= "Incorect password! Please try again.";

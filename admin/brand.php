@@ -8,6 +8,8 @@ if(!is_logged_in()){
 include 'include/head.php';
 include 'include/nav.php';
 
+
+
 //get brand from DB\
 $sql = "SELECT * FROM brand ORDER BY brand";
 $result = $dbConnect->query($sql);

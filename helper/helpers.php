@@ -31,7 +31,7 @@ function login($user_id){   //function to handle the user login
   $sql = "UPDATE users SET lastLogin = '$date' WHERE id = '$user_id'";
   $dbConnect->query($sql);
 
-  $_SESSION['success_login'] = "You are now logged-in";  //create a new session for user successfull login and to hold a message of login success, this session will be used in the init.php which is loaded in every page that need init.php
+  $_SESSION['success_msg'] = "You are now logged-in";  //create a new session for user successfull login and to hold a message of login success, this session will be used in the init.php which is loaded in every page that need init.php
   header('Location: index.php');
 }
 
@@ -53,7 +53,7 @@ function permission_error_redirect($url = 'login.php'){  //funtion to redirect u
   header('Location: '.$url);
 }
 
-function permission($perms = 'admin'){
+function permission($perms = 'admin'){  //function to check user's permission
   global $userData;
   $permission = explode(',', $userData['permission']);
   if(in_array($perms, $permission, true)){
@@ -62,7 +62,6 @@ function permission($perms = 'admin'){
     return false;
   }
 }
-
 
 function dateFormatter($date){   //function to format the date to display in this format month, day, year, time
   return date("M d, Y h:i A", strtotime($date));  //date() is php function, 1st param is format we want to display, 2nd param is the $var tha hold the date from DB, strtotime() is a php function to parse/convert the string of the date stored in the DB to Unix timestamp
@@ -84,4 +83,26 @@ function getCategory($child_id){  //function to get the parent name and child na
   $category = mysqli_fetch_assoc($query);
 
   return $category;   //this will return $category as an array. check using var_dump($category) in category.php
+}
+
+
+ function sizeToArray($string)
+ {
+   $sizeArray = explode(',', $string);
+   $returnArray = array();  //initialize
+   foreach ($sizeArray as $size) {
+     $s = explode(':', $size);
+     $returnArray[] = array('size'=>$s[0], 'quantity'=>$s[1]);
+   }
+   return $returnArray;
+ }
+
+function sizeToString($sizes){
+  $sizeString = '';
+  foreach ($sizes as $tempSize) {
+    $sizeString .= $tempSize['size'].':'.$tempSize['quantity'].',';
+  }
+  $trimmed = rtrim($sizeString, ',');
+
+  return $trimmed;
 }

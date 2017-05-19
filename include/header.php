@@ -1,8 +1,8 @@
 <!--Header -->
-<div id="headerWrapper">
-  <div id="black-flower"></div>
-  <div id="logotext"></div>
-  <div id="for-flower"></div>
+<div id="header-wrapper">   <!--the cloud image -->
+
+<div id="logotext"></div>  <!--the text that display [old pc shop stuff] -->
+
 </div>
 <!--Header end -->
 <!--container start-->

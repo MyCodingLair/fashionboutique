@@ -1,4 +1,6 @@
+// Script for the quantity selector button Start here
 
+<script>
 //plugin bootstrap minus and plus
 //http://jsfiddle.net/laelitenetwork/puJ6G/
 $('.btn-number').click(function(e){
@@ -73,3 +75,6 @@ $(".input-number").keydown(function (e) {
         }
     });
 
+</script>
+
+// Script for the quantity selector button End here

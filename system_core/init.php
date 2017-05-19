@@ -1,5 +1,5 @@
 <?php
-  $dbConnect = mysqli_connect("localhost", "root", "", "opss");
+  $dbConnect = mysqli_connect("localhost", "root", "", "fb");
 
   if(mysqli_connect_errno()){
     echo'Error connecting to Database. ' .mysqli_connect_error();
@@ -9,9 +9,10 @@
 session_start();
 //The BASE_URL is already define in the config.php
 //since this page is already included in the idex.php it will have access to the following code:
-require_once $_SERVER['DOCUMENT_ROOT'].'/new/oldpcstuffshop/system_core/config.php';
-//require_once $_SERVER['DOCUMENT_ROOT'].'/new/oldpcstuffshop/config.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/new/fashionboutique/system_core/config.php';
+//require_once 'config.php';
 require_once BASE_URL.'helper/helpers.php';
+//require_once $_SERVER['DOCUMENT_ROOT'].'/new/fashionboutique/helper/helpers.php';
 
 require BASE_URL. 'vendor/autoload.php';
 
@@ -22,9 +23,7 @@ $cart_id = '';
 //check if cookie exist, and asign it to $cart_id, $cart_id coorespond to the id in the DB in the (cart) table, when user log in to site, this will check if the cookies which hold the cart exist, if exist pull data from DB
 if(isset($_COOKIE[CART_COOKIE])){
   $cart_id = sanitize($_COOKIE[CART_COOKIE]);
-
 }
-
 
 
 if(isset($_SESSION['userID'])){  //the value is set form helpers.php
@@ -47,4 +46,9 @@ if(isset($_SESSION['success_msg'])){  //this $_SESSION['success_msg'] is from he
 if(isset($_SESSION['error_msg'])){
   echo '<div class="bg-danger"> <p class="text-danger text-center"> '.$_SESSION['error_msg'].' </p> </div>';
   unset($_SESSION['error_msg']);
+}
+
+if(isset($_SESSION['passHavNotChange'])){
+  echo '<div class="bg-danger"> <p class="text-danger text-center"> '.$_SESSION['passHavNotChange'].' </p> </div>';
+  unset($_SESSION['passHavNotChange']);
 }

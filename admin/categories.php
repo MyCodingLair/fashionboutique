@@ -1,12 +1,11 @@
 <?php
-  require_once $_SERVER['DOCUMENT_ROOT'].'/new/oldpcstuffshop/system_core/init.php';
+  require_once $_SERVER['DOCUMENT_ROOT'].'/new/fashionboutique/system_core/init.php';
+  include 'include/head.php';
+  include 'include/nav.php';
 
   if(!is_logged_in()){
     login_error_redirect();
   }
-
-  include 'include/head.php';
-  include 'include/nav.php';
 
   $sql = "SELECT * FROM categories WHERE parent = 0";
   $result = $dbConnect->query($sql);
@@ -21,11 +20,11 @@
     $result = $dbConnect->query($sql);
     $category = mysqli_fetch_assoc($result);
     if($category['parent'] == 0){  //if parent is deleted, delete child as well
-      $deleteParentNchild = "DELETE FROM categories WHERE id = '{$delete_id}' OR parent = '{$delete_id}' ";
+      $deleteParentNchild = "DELETE FROM categories WHERE id = '$delete_id' AND parent = '$delete_id' ";
       $dbConnect->query('$deleteParentNchild');
       header('Location: categories.php');
     }
-     $deleteSql = "DELETE FROM categories WHERE id = '$delete_id'  AND parent = '$delete_id'";
+     $deleteSql = "DELETE FROM categories WHERE id = '$delete_id'  OR parent = '$delete_id'";
      $dbConnect->query($deleteSql);
      header('Location: categories.php');
   }

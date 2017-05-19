@@ -25,8 +25,7 @@
       </li>
     <?php endwhile; ?>  <!--The above method is done in one table, it can be done using 2 table as well, did that in "test-nav.php" -->
     <li><a href="cart.php"><span class="glyphicon glyphicon-shopping-cart"></span> Cart </a></li>
-
-      <!--Menu dropdown end -->
+    <!--Menu dropdown end -->
     </ul>
   </div>
 </nav>

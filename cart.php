@@ -1,11 +1,10 @@
 <?php
 
-require '/system_core/init.php';
+require_once 'system_core/init.php';
 include 'include/head.php';
 include 'include/nav.php';
 include 'include/header_trimmed.php';
 
-$clientToken = Braintree_ClientToken::generate();
 
 
 if($cart_id != ''){   //if $cart_id is not empty meaning if the cookie is set because $cart_id is set by the cookie in init.php and config.php
@@ -46,7 +45,7 @@ if($cart_id != ''){   //if $cart_id is not empty meaning if the cookie is set be
     <?php else: ?>
       <table class="table table-bordered table-condensed table-striped">
         <thead>
-          <th>#</th> <th>Item</th> <th>Price</th> <th>Quantity</th>  <th>Sub-total</th>
+          <th>#</th> <th>Item</th> <th>Price</th> <th>Quantity</th> <th>Size</th> <th>Sub-total</th>
         </thead>
         <tbody>
           <?php
@@ -57,25 +56,31 @@ if($cart_id != ''){   //if $cart_id is not empty meaning if the cookie is set be
 
             $productDetails = mysqli_fetch_assoc($productSql);
 
-            $available = $productDetails['quantityAvailable'];
-
-         
+            $sizeArray = explode(',', $productDetails['sizes']);
+            foreach ($sizeArray as $sizeString) {
+              $size = explode(':', $sizeString);
+              if($size[0] == $tempItem['size']){
+                $available = $size[1];
+              }
+            }
             ?>
             <!--Display table content (cart item)-->
             <tr>
               <td><?=$i;?></td>
               <td> <?=$productDetails['title'];?> </td>
               <td> <?=dollar($productDetails['price']);?> </td>
-              <td> 
-                <button class="btn btn-xs btn-default" onclick="updateCart('substract1', '<?=$productDetails['id'];?>', '<?= $tempItem['quantity'];?>');">-</button>
-                 <?=$tempItem['quantity'];?>
-                 <?php if($tempItem['quantity'] < $available):?>
-                <button class="btn btn-xs btn-default" onclick="updateCart('add1', '<?=$productDetails['id'];?>', '<?= $tempItem['quantity'];?>');">+</button>
-                 <?php else:?>
-                <span class="text-danger">Max available reach.</span>
-                 <?php endif;?>
+              <td>
+                <button class="btn btn-xs btn-default" onclick="updateCart('substract1', '<?=$productDetails['id'];?>', '<?= $tempItem['size'];?>');">-</button>
+                <?=$tempItem['quantity'];?>
+                <?php if($tempItem['quantity'] < $available):?>
+                <button class="btn btn-xs btn-default" onclick="updateCart('add1', '<?=$productDetails['id'];?>', '<?=$tempItem['size'];?>');">+</button>
+              <?php else:?>
+              <span class="text-danger">Max available reach.</span>
+              <?php endif;?>
               </td>
+              <td> <?=$tempItem['size'];?> </td>
               <td> <?=dollar($tempItem['quantity'] * $productDetails['price']);?> </td>
+
             </tr>
 
           <?php
@@ -133,7 +138,7 @@ if($cart_id != ''){   //if $cart_id is not empty meaning if the cookie is set be
                 <input type="hidden" name="subTotal" value="<?=$subTotal;?>">
                 <input type="hidden" name="grandTotal" value="<?=$grandTotal;?>">
                 <input type="hidden" name="cart_id" value="<?=$cart_id;?>">
-                <input type="hidden" name="description" value="<?=$itemCount.' item'.(($itemCount>1)?'s':'').' from OldPcStuffShop.';?>">
+                <input type="hidden" name="description" value="<?=$itemCount.' item'.(($itemCount>1)?'s':'').' from fashionboutique.';?>">
 
 
 
@@ -227,15 +232,6 @@ if($cart_id != ''){   //if $cart_id is not empty meaning if the cookie is set be
     </div>
     <!--Checout Button trigger modal from bootsrap-->
 
-<form>
-  <div id="dropin-container"></div>
-</form>
-
-<h3>Payment</h3>
-<hr>
-<div id="payment">
-
-</div>
 
 
     <?php endif; ?>
@@ -272,7 +268,7 @@ function checkAddress(){
   };
 
   jQuery.ajax({
-    url     : '/new/oldpcstuffshop/admin/parser/check_address.php',
+    url     : '/new/fashionboutique/admin/parser/check_address.php',
     method  : 'POST',
     data    : data,
     success : function(data){  //the data in this function is return form the check_address.php it is not the same as the data above
@@ -296,6 +292,70 @@ function checkAddress(){
 }
 
 
+
+
+
+
+//Stripe.setPublisheableKey('<?=STRIPE_PUBLIC;?>');
+Stripe.setPublishableKey('pk_test_vD1A3wyfXZe5Z9Qk5XVakaZy');
+
+// Stripe.card.createToken({
+//   number: $('#cardNum').val(),
+//   cvc: $('#cvc').val(),
+//   exp_month: $('#cardExpireMonth').val(),
+//   exp_year: $('#cardExpireYear').val()
+// }, stripeResponseHandler);
+
+
+
+
+jQuery(function($){
+  $('#payment-form').submit(function(event) {
+    var $form = $(this);
+
+    //disable the submit button to prevent repeated clicks
+    $form.find('button').prop('disabled', true);
+
+    //Stripe.card.createToken($form, stripeResponseHandler);
+        Stripe.card.createToken({
+          number: $('#cardNum').val(),
+          cvc: $('#cvc').val(),
+          exp_month: $('#cardExpireMonth').val(),
+          exp_year: $('#cardExpireYear').val()
+        }, stripeResponseHandler);
+
+
+    //prevent the form frim submtting with the default action
+    return false;
+  });
+
+});
+
+
+function stripeResponseHandler(status, response) {
+
+  // Grab the form:
+  var $form = $('#payment-form');
+
+  if (response.error) { // Problem!
+
+    // Show the errors on the form
+    $form.find('#payment-errors').text(response.error.message);
+    $form.find('button').prop('disabled', false); // Re-enable submission
+
+  } else { // Token was created!
+
+    // Get the token ID:
+    var token = response.id;
+
+    // Insert the token into the form so it gets submitted to the server:
+    $form.append($('<input type="hidden" name="stripeToken" />').val(token));
+
+    // Submit the form:
+    $form.get(0).submit();
+
+  }
+}
 
 
 

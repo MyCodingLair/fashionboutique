@@ -1,12 +1,12 @@
 <?php
-require_once $_SERVER['DOCUMENT_ROOT'].'/new/oldpcstuffshop/system_core/init.php';
+require_once $_SERVER['DOCUMENT_ROOT'].'/new/fashionboutique/system_core/init.php';
+include 'include/head.php';
+include 'include/nav.php';
 
 if(!is_logged_in()){
   login_error_redirect();
 }
 
-include 'include/head.php';
-include 'include/nav.php';
 
 if(isset($_GET['restore'])){
   $id_restore = sanitize($_GET['restore']);
