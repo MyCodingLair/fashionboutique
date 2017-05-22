@@ -60,10 +60,10 @@ if (isset($_GET['add']) || isset($_GET['edit'])) { //if the addProduct button is
     $title = ((isset($_POST['title']) && $_POST['title'] != '')?sanitize($_POST['title']):$editProductDetails['title']);
     $brand = ((isset($_POST['brand']) && $_POST['brand'] != '')?sanitize($_POST['brand']):$editProductDetails['brand']);
     $price = ((isset($_POST['price']) && $_POST['price'] != '')?sanitize($_POST['price']):$editProductDetails['price']);
-    $list_price = ((isset($_POST['list_price']) && $_POST['list_price'] != '')?sanitize($_POST['list_price']):$editProductDetails['listPrice']);
+    $list_price = ((isset($_POST['list_price']))?sanitize($_POST['list_price']):$editProductDetails['listPrice']);
     $sizes = ((isset($_POST['sizesQtyPreview']) && $_POST['sizesQtyPreview'] != '')?sanitize($_POST['sizesQtyPreview']):$editProductDetails['sizes']);
     //$sizes = rtrim($sizes, ',');  //just to double check and make sure that there is not comma at the end of the string
-    $description = ((isset($_POST['description']) && $_POST['description'] != '')?sanitize($_POST['description']):$editProductDetails['description']);
+    $description = ((isset($_POST['description']))?sanitize($_POST['description']):$editProductDetails['description']);
 
     //query to get parent for the product from categories
     $parentSqlForEdit = $dbConnect->query("SELECT * FROM categories WHERE id = '$categories'");
@@ -105,8 +105,6 @@ if (isset($_GET['add']) || isset($_GET['edit'])) { //if the addProduct button is
     // $description = sanitize($_POST['description']);
     //$parent = sanitize($_POST['parent']);  //not in tutorial
 
-
-
     $errors = array();  //initialize
 
 
@@ -119,104 +117,109 @@ if (isset($_GET['add']) || isset($_GET['edit'])) { //if the addProduct button is
         break;
       }
     }
-    if(!empty($_FILES)){
-      //var_dump($_FILES);  //if we var_dump the picture files, we will get an array with 5 element,
-      //the 1st element index[0] is the name of the picture file
-      //the 2nd element index[1] is the type/format/extension of the files
-      //the 3rd element index[2] is the current temp location of the files
-      //the 4th element index[3] is the error if any and is in int. if 0 no errors, 1 has erros
-      //the 5th element index[4] is the size of the file in bytes
-      $picture = $_FILES['picture'];  //this will assign the array of the files to $picture, so now $picture is an array
-      //var_dump($picture);   //for debug delete later
-      //file name FILE[0]
-      $name = $picture['name']; //assign the name of the picture file to the var $name
-      $nameArray = explode('.', $name); //this will explode the file name by the ".", and store it in the $nameArray, so the first element of this array is the name of the picture file, and the second element can be the extension fo the files
 
-      //seperate the file name and extension
-      $fileName = $nameArray[0];  //assign the first element of the exploded $nameArray to the var $fileName
-      $fileExt = $nameArray[1];   //assign the second element of the exploded $nameArray to the var $fileExt
+    var_dump($_FILES['picture']);
+    $pictureCount = count($_FILES['picture']['name']);  //this is to count the element in the array
 
-      //this is to get the file type and the file extension, check using var_dump
-      //FILE[1]
-      $fileType = explode('/',$picture['type']);   //explode the file with '/', using var_dump we can see the file type is set as 'image/jpeg' which is 'theFileType/theFileExtension'
-      $fileTypeName = $fileType[0]; //assign the name of the file type to the var $fileTypeName e.g. image, video, txt, etc
-      $fileTypeExt = $fileType[1];  //assign the extension of the file to the var $fileTypeExt e.g. .jpg, .png, .jpeg, .mp4, etc
-
-      //the file temp location
-      //FILE[2]
-      $tempLoc = $picture['tmp_name'];
-
-      //the size of the file
-      //FILE[3]
-      $sizeOfFile = $picture['size'];
-      $allowedFormat = array('png', 'jpg', 'jpeg', 'gif');  //an array to hold the allowed file format for the picture
-      // ************************************************************************************************
-      //to change the file upload name
-      //$uploadName = md5(microtime()).'.'.$fileExt;
-      //change the name of the file to be uploded
-      $getBrandName = "SELECT * FROM brand WHERE id = $brand";
-      $getCatName = "SELECT * FROM categories WHERE id = $categories";
-      $getParent = "SELECT * FROM categories WHERE parent = 0 AND id = $parent";
-      $resultBrandName = $dbConnect->query($getBrandName);
-      $resultCatName = $dbConnect->query($getCatName);
-      $resultParent = $dbConnect->query($getParent);
-      if(!($dbConnect->query($getParent))){
-        echo $dbConnect->error;
-      }
-      $uploadBrandName = mysqli_fetch_assoc($resultBrandName);
-      $uploadCatName = mysqli_fetch_assoc($resultCatName);
-      $uploadParentName = mysqli_fetch_assoc($resultParent);
-
-      $titleUpload = str_replace(' ', '', $title);
-      // var_dump($titleUpload);
-      // var_dump($fileName);
-      // var_dump($fileExt);
-      // var_dump($fileTypeName);
-      // var_dump($fileTypeExt);
-
-      // $uploadCatName = trim($uploadCatName, ' ');
-      // var_dump($uploadCatName);
-      $uploadName = $uploadParentName['categoryName'].'-'.$uploadBrandName['brand'].'-'.$titleUpload.'.'.$fileExt;
-      // ************************************************************************************************
-
-      //$imagePath = '/new/fashionboutique/images/products/'.$uploadName;
-      //$uploadLoc = BASE_URL.'/images/products/'.$uploadName; //the location to upload the file
-
-      //check if file is an image
-      if($fileTypeName != 'image'){
-        $errors[] .= "The files must be an image!";
-      }
-      //check if the format is an allowed format
-      if(!in_array(($fileExt || $fileTypeExt), $allowedFormat)){  //search if the $fileExt is within the $allowedFormat array.
-        $errors[] .= "The picture must be in the format of '.png', '.jpg', '.jpeg' or '.gif' only!";
-      }
-      //check for size
-      if($sizeOfFile > 5000000){
-        $errors[] .= "The file size must be under 5MB!";
-      }
-      //check for file extension in the file name if it is not the same as the actual file extension
-      if($fileExt != $fileTypeExt && ($fileTypeExt == 'jpeg' && $fileExt != 'jpg')){
-        $errors[] .= "The file extension does not match the file. Please check the file name of the picture. Rename it if possible.";
-      }
-
-    }
+    // if($_FILES['picture']['name'] != ''){   //changed form if(!empty($_FILES){} _to_ if($_FILES['picture']['name'] != ''){}  this is so that even if file post is empty the following code will still execute
+    if($pictureCount > 0){  //changed form the above
+    //   //var_dump($_FILES);  //if we var_dump the picture files, we will get an array with 5 element,
+    //   //the 1st element index[0] is the name of the picture file
+    //   //the 2nd element index[1] is the type/format/extension of the files
+    //   //the 3rd element index[2] is the current temp location of the files
+    //   //the 4th element index[3] is the error if any and is in int. if 0 no errors, 1 has erros
+    //   //the 5th element index[4] is the size of the file in bytes
+    //   $picture = $_FILES['picture'];  //this will assign the array of the files to $picture, so now $picture is an array
+    //   //var_dump($picture);   //for debug delete later
+    //   //file name FILE[0]
+    //   $name = $picture['name']; //assign the name of the picture file to the var $name
+    //   $nameArray = explode('.', $name); //this will explode the file name by the ".", and store it in the $nameArray, so the first element of this array is the name of the picture file, and the second element can be the extension fo the files
+    //
+    //   //seperate the file name and extension
+    //   $fileName = $nameArray[0];  //assign the first element of the exploded $nameArray to the var $fileName
+    //   $fileExt = $nameArray[1];   //assign the second element of the exploded $nameArray to the var $fileExt
+    //
+    //   //this is to get the file type and the file extension, check using var_dump
+    //   //FILE[1]
+    //   $fileType = explode('/',$picture['type']);   //explode the file with '/', using var_dump we can see the file type is set as 'image/jpeg' which is 'theFileType/theFileExtension'
+    //   $fileTypeName = $fileType[0]; //assign the name of the file type to the var $fileTypeName e.g. image, video, txt, etc
+    //   $fileTypeExt = $fileType[1];  //assign the extension of the file to the var $fileTypeExt e.g. .jpg, .png, .jpeg, .mp4, etc
+    //
+    //   //the file temp location
+    //   //FILE[2]
+    //   $tempLoc = $picture['tmp_name'];
+    //
+    //   //the size of the file
+    //   //FILE[3]
+    //   $sizeOfFile = $picture['size'];
+    //   $allowedFormat = array('png', 'jpg', 'jpeg', 'gif');  //an array to hold the allowed file format for the picture
+    //   // ************************************************************************************************
+    //   //to change the file upload name
+    //   //$uploadName = md5(microtime()).'.'.$fileExt;
+    //   //change the name of the file to be uploded
+    //   $getBrandName = "SELECT * FROM brand WHERE id = $brand";
+    //   $getCatName = "SELECT * FROM categories WHERE id = $categories";
+    //   $getParent = "SELECT * FROM categories WHERE parent = 0 AND id = $parent";
+    //   $resultBrandName = $dbConnect->query($getBrandName);
+    //   $resultCatName = $dbConnect->query($getCatName);
+    //   $resultParent = $dbConnect->query($getParent);
+    //   if(!($dbConnect->query($getParent))){
+    //     echo $dbConnect->error;
+    //   }
+    //   $uploadBrandName = mysqli_fetch_assoc($resultBrandName);
+    //   $uploadCatName = mysqli_fetch_assoc($resultCatName);
+    //   $uploadParentName = mysqli_fetch_assoc($resultParent);
+    //
+    //   $titleUpload = str_replace(' ', '', $title);
+    //   // var_dump($titleUpload);
+    //   // var_dump($fileName);
+    //   // var_dump($fileExt);
+    //   // var_dump($fileTypeName);
+    //   // var_dump($fileTypeExt);
+    //
+    //   // $uploadCatName = trim($uploadCatName, ' ');
+    //   // var_dump($uploadCatName);
+    //   $uploadName = $uploadParentName['categoryName'].'-'.$uploadBrandName['brand'].'-'.$titleUpload.'.'.$fileExt;
+    //   // ************************************************************************************************
+    //
+    //   //$imagePath = '/new/fashionboutique/images/products/'.$uploadName;
+    //   //$uploadLoc = BASE_URL.'/images/products/'.$uploadName; //the location to upload the file
+    //
+    //   //check if file is an image
+    //   if($fileTypeName != 'image'){
+    //     $errors[] .= "The files must be an image!";
+    //   }
+    //   //check if the format is an allowed format
+    //   if(!in_array(($fileExt || $fileTypeExt), $allowedFormat)){  //search if the $fileExt is within the $allowedFormat array.
+    //     $errors[] .= "The picture must be in the format of '.png', '.jpg', '.jpeg' or '.gif' only!";
+    //   }
+    //   //check for size
+    //   if($sizeOfFile > 5000000){
+    //     $errors[] .= "The file size must be under 5MB!";
+    //   }
+    //   //check for file extension in the file name if it is not the same as the actual file extension
+    //   if($fileExt != $fileTypeExt && ($fileTypeExt == 'jpeg' && $fileExt != 'jpg')){
+    //     $errors[] .= "The file extension does not match the file. Please check the file name of the picture. Rename it if possible.";
+    //   }
+    //
+    // }
     if(!empty($errors)){
       echo display_errors($errors);
     } else {
-      //upload file and insert into DB
-      if(!empty($_FILES)){
-      $imagePath = '/new/fashionboutique/images/products/'.$uploadParentName['categoryName'].'/'.$uploadName;
-      //var_dump($imagePath); //image path to be store in DB, with adding the parent name as the path
-      $uploadLoc = BASE_URL.'images/products/'.$uploadParentName['categoryName'].'/'.$uploadName; //the location to upload the file with adding the parenrt name as the path
-      // $uploadDir check if file path already exist, if not exist create it
-      $uploadDir = BASE_URL.'images/products/'.$uploadParentName['categoryName'].'/';
-
-      // if(!file_exists($uploadDir)){
-      //   mkdir($uploadDir, 0777, true);
+      // //upload file and insert into DB
+      // if(!empty($_FILES)){
+      // $imagePath = '/new/fashionboutique/images/products/'.$uploadParentName['categoryName'].'/'.$uploadName;
+      // //var_dump($imagePath); //image path to be store in DB, with adding the parent name as the path
+      // $uploadLoc = BASE_URL.'images/products/'.$uploadParentName['categoryName'].'/'.$uploadName; //the location to upload the file with adding the parenrt name as the path
+      // // $uploadDir check if file path already exist, if not exist create it
+      // $uploadDir = BASE_URL.'images/products/'.$uploadParentName['categoryName'].'/';
+      //
+      // // if(!file_exists($uploadDir)){
+      // //   mkdir($uploadDir, 0777, true);
+      // // }
+      //
+      //   move_uploaded_file($tempLoc, $uploadLoc);  //upload the file to the specified file path only if there is file to be upload
       // }
-
-        move_uploaded_file($tempLoc, $uploadLoc);  //upload the file to the specified file path only if there is file to be upload
-      }
 
       $addProductSql = "INSERT INTO product (`title`, `price`, `listPrice`, `brand`, `categories`, `productImage`, `description`, `sizes`)
       VALUES ('$title', '$price', '$list_price', '$brand', '$categories', '$imagePath', '$description', '$sizes')";
@@ -297,7 +300,7 @@ if (isset($_GET['add']) || isset($_GET['edit'])) { //if the addProduct button is
       <a href="product.php?delete_image=1&edit=<?=$edit_id;?>" class="text-danger">Delete Image</a>
     <?php else: ?>
       <label for="picture">Product Picture: </label>
-      <input type="file" name="picture" class="form-control" id="picture" >
+      <input type="file" name="picture[]" class="form-control" id="picture" multiple>
     <?php endif; ?>
   </div>
 

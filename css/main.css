@@ -130,3 +130,17 @@ img.details{
 #checkOutBtn{
   display: none;
 }
+
+#cart_widget td{
+  font-size: 11px;
+}
+#recent_widget td{
+  font-size: 11px;
+}
+#cart_msg{
+  font-size: 11px;
+}
+
+input.priceRange{
+  width: 55px;
+}
